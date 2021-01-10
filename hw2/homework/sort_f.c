@@ -20,10 +20,80 @@
  * IN THE SOFTWARE.
  **/
 
-
 #include "./util.h"
 
-void sort_f(data_t* A, int p, int r) {
-  printf("Unimplemented!\n");
+// Function prototypes
+inline static void merge_f(data_t* A, data_t* t, int p, int q, int r);
+inline static void copy_f(data_t* source, data_t* dest, int n);
+void sort_f_inner(data_t* A, data_t* t, int p, int r);
+void sort_f(data_t* A, int p, int r);
+void isort(data_t* begin, data_t* end);
+
+// A basic merge sort routine that sorts the subarray A[p..r]
+inline void sort_f(data_t* A, int p, int r) {
+  assert(A);
+  data_t* tmp = 0;
+  mem_alloc(&tmp, (r - p + 1) / 2 + 1);
+  if (tmp == NULL) {
+    return;
+  }
+
+  sort_f_inner(A, tmp, p, r);
+
+  mem_free(&tmp);
+}
+
+inline void sort_f_inner(data_t* A, data_t* t, int p, int r) {
+  assert(A);
+  if (r - p > 32) {
+    int q = (p + r) / 2;
+    sort_f_inner(A, t, p, q);
+    sort_f_inner(A, t, q + 1, r);
+    merge_f(A, t, p, q, r);
+  } else if (p < r) {
+    isort(&(A[p]), &(A[r]));
+  }
+}
+
+// A merge routine. Merges the sub-arrays A [p..q] and A [q + 1..r].
+// Uses two arrays 'left' and 'right' in the merge operation.
+inline static void merge_f(data_t* A, data_t* t, int p, int q, int r) {
+  assert(A);
+  assert(p <= q);
+  assert((q + 1) <= r);
+  int n1 = q - p + 1;
+  int n2 = r - q;
+  int n = n1 + n2;
+
+  data_t* lt = t;
+  data_t* rt = &(A[q + 1]);
+  copy_f(&(A[p]), lt, n1);
+  lt[n1] = UINT_MAX;
+
+  data_t* dest = &(A[p]);
+
+  int rt_used = 0;
+  for (int i = 0; i < n; i++) {
+    if (rt_used == n2 || *lt <= *rt) {
+      *dest = *lt;
+      lt++;      
+    } else {
+      *dest = *rt;
+      rt++;
+      rt_used++;
+    }
+    dest++;
+  }
+}
+
+inline static void copy_f(data_t* source, data_t* dest, int n) {
+  assert(dest);
+  assert(source);
+
+  for (int i = 0 ; i < n ; i++) {
+    *dest = *source;
+    dest++;
+    source++;
+  }
 }
 
