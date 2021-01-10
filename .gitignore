@@ -1,0 +1,7 @@
+hw2/homework/sort
+hw2/recitation/sum
+cachegrind.*
+perf.*
+\#*\#
+*.o
+
